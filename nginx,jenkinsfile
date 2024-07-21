@@ -20,14 +20,14 @@ pipeline {
         }
         stage("build docker") {
             steps {
-                docker.build("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:latest")
+                docker.build("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:${env.BUILD_ID}")
             }
         }
         stage('Pushing the Docker Image'){
             steps{
                 script{
                         docker.withRegistry('', "${env.DOCEKRHUB_ID}"){
-                            docker.image("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:latest").push()
+                            docker.image("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:${env.BUILD_ID}").push()
                         }
                 }
             }
