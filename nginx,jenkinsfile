@@ -2,21 +2,23 @@ pipeline {
     agent any
     environment {
         GIT_REPO = 'https://github.com/Sukhilnair/dockerize_nginx.git'
-        DOCKERHUB_ID = 'sukhil-dockerhub-cred'
+        DOCKERHUB_ID = 'sukhil-dockerhub'
         DOCKERHUB_USERNAME = 'sukhilnair'
         DOCKERHUB_REPO = 'jenkins-class'
-        BUILD_ID = "${env.BUILD_NUMBER}" // Setting the BUILD_ID to the Jenkins build number
     }
 
     stages {
-        stage('Hello') {
-            steps {
-                echo 'Hello World'
-            }
-        }
         stage('Code Cloning') {
             steps {
                 git branch: 'main', url: "${env.GIT_REPO}"
+            }
+        }
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+                sh'''
+                whoami
+                '''
             }
         }
         stage('Build Docker') {
@@ -33,6 +35,19 @@ pipeline {
                         docker.image("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:${env.BUILD_ID}").push()
                     }
                 }
+            }
+        }
+    }
+    post{
+        success{
+            script{
+                echo "Pipeline 1 is completed, Triggering pipeline 2"
+                build job: 'sukhil-mern-build', wait: false
+            }
+        }
+        failure{
+            script{
+                echo "Pipeline build was failed."
             }
         }
     }
