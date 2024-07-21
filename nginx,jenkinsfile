@@ -1,10 +1,11 @@
 pipeline {
     agent any
-    environment{
+    environment {
         GIT_REPO = 'https://github.com/Sukhilnair/dockerize_nginx.git'
-        DOCEKRHUB_ID = 'sukhil-dockerhub-cred'
-        DOCKERHUB_USERNAME = "sukhilnair"
-        DOCKERHUB_REPO = "jenkins-class"
+        DOCKERHUB_ID = 'sukhil-dockerhub-cred'
+        DOCKERHUB_USERNAME = 'sukhilnair'
+        DOCKERHUB_REPO = 'jenkins-class'
+        BUILD_ID = "${env.BUILD_NUMBER}" // Setting the BUILD_ID to the Jenkins build number
     }
 
     stages {
@@ -13,22 +14,24 @@ pipeline {
                 echo 'Hello World'
             }
         }
-        stage("code cloning") {
+        stage('Code Cloning') {
             steps {
                 git branch: 'main', url: "${env.GIT_REPO}"
             }
         }
-        stage("build docker") {
+        stage('Build Docker') {
             steps {
-                docker.build("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:${env.BUILD_ID}")
+                script {
+                    docker.build("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:${env.BUILD_ID}")
+                }
             }
         }
-        stage('Pushing the Docker Image'){
-            steps{
-                script{
-                        docker.withRegistry('', "${env.DOCEKRHUB_ID}"){
-                            docker.image("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:${env.BUILD_ID}").push()
-                        }
+        stage('Pushing the Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('', "${env.DOCKERHUB_ID}") {
+                        docker.image("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:${env.BUILD_ID}").push()
+                    }
                 }
             }
         }
