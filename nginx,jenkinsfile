@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    enviroment{
+    environment{
         GIT_REPO = 'https://github.com/Sukhilnair/dockerize_nginx.git'
         DOCEKRHUB_ID = 'sukhil-dockerhub-cred'
         DOCKERHUB_USERNAME = "sukhilnair"
