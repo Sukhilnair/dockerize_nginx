@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+    enviroment{
+        GIT_REPO = 'https://github.com/Sukhilnair/dockerize_nginx.git'
+        DOCEKRHUB_ID = 'sukhil-dockerhub-cred'
+        DOCKERHUB_USERNAME = "sukhilnair"
+        DOCKERHUB_REPO = "jenkins-class"
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage("code cloning") {
+            steps {
+                git branch: 'main', url: "${env.GIT_REPO}"
+            }
+        }
+        stage("build docker") {
+            steps {
+                docker.build("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:latest")
+            }
+        }
+        stage('Pushing the Docker Image'){
+            steps{
+                script{
+                        docker.withRegistry('', "${env.DOCEKRHUB_ID}"){
+                            docker.image("${env.DOCKERHUB_USERNAME}/${env.DOCKERHUB_REPO}:latest").push()
+                        }
+                }
+            }
+        }
+    }
+}
